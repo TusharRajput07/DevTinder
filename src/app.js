@@ -4,16 +4,12 @@ const User = require("./config/model/user");
 
 const app = express();
 
+// middleware provided by express to convert req json object to javascript object for all the below API's
+app.use(express.json());
+
 // api to save a user to the database
 app.post("/signup", async (req, res) => {
-  const user = new User({
-    firstName: "Elon",
-    lastName: "Musk",
-    email: "musk@gmail.com",
-    age: 55,
-    gender: "male",
-    bio: "jaadu hi kehde  ",
-  });
+  const user = new User(req.body);
 
   try {
     await user.save();
