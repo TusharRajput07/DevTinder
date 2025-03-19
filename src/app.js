@@ -1,141 +1,61 @@
 const express = require("express");
 const connectDB = require("./config/database");
 const User = require("./config/model/user");
-const { validateSignUpData } = require("./utils/validation");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
 const app = express();
 
 // middleware provided by express to convert req json object to javascript object for all the below API's
 app.use(express.json());
-
 app.use(cookieParser());
 
-// api to save a user to the database
-app.post("/signup", async (req, res) => {
-  try {
-    const { firstName, lastName, email, password } = req.body;
+const authRouter = require("./routes/authentication");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/requests");
 
-    // validate the data
-    validateSignUpData(req);
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
-    // encrypt the password
-    const passwordHash = await bcrypt.hash(password, 10);
+// // api to get a user with email from db
+// app.get("/user", async (req, res) => {
+//   const userEmail = req.body.email;
 
-    // store the data
+//   try {
+//     const users = await User.find({ email: userEmail }); // returns an array of all the matching docs with this email
+//     if (users.length === 0) {
+//       res.send("user not found");
+//     } else {
+//       res.send(users);
+//     }
+//   } catch (err) {
+//     req.status(400).send("Something went wrong");
+//   }
+// });
 
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: passwordHash,
-    });
+// // api for the feed page : getting all the users from the db
+// app.get("/feed", async (req, res) => {
+//   try {
+//     const users = await User.find({}); // empty filter returns all data
+//     res.send(users);
+//   } catch (err) {
+//     res.status(400).send("Something went wrong");
+//   }
+// });
 
-    await user.save();
-    res.send("User added successfully");
-  } catch (err) {
-    res.status(400).send("Error saving the user : " + err.message);
-  }
-});
+// // api to delete a user from db (by id)
+// app.delete("/user", async (req, res) => {
+//   const userId = req.body.userId;
 
-// api to login a user
-app.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
+//   try {
+//     await User.findByIdAndDelete(userId);
+//     res.send("user deleted successfully");
+//   } catch (err) {
+//     res.status(400).send("Something went wrong");
+//   }
+// });
 
-    // check if user with this email is present in the db or not
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      throw new Error("Invalid credentials");
-    }
-    // if yes, then compare the password with the hashed db password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (isPasswordValid) {
-      // create a jwt token
-      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$123");
-
-      // add the token to cookie
-      res.cookie("token", token);
-
-      // send the response
-      res.send("login successfull!");
-    } else {
-      throw new Error("Invalid credentials");
-    }
-  } catch (err) {
-    res.status(400).send("Something went wrong : " + err.message);
-  }
-});
-
-// api to get the profile of user by cookie token after authentication
-app.get("/profile", async (req, res) => {
-  try {
-    // fetch the token from the cookie
-    const cookies = req.cookies;
-    const { token } = cookies;
-    if (!token) {
-      throw new Error("Invalid Token");
-    }
-
-    // authentication : verify the token with passkey
-    const jwtData = await jwt.verify(token, "DEV@Tinder$123");
-    const { _id } = jwtData;
-
-    // find the user by id
-    const user = await User.findById(_id);
-    if (!user) {
-      throw new Error("User not found. Login Again");
-    }
-
-    // send the response data
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("Something went wrong : " + err.message);
-  }
-});
-
-// api to get a user with email from db
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.email;
-
-  try {
-    const users = await User.find({ email: userEmail }); // returns an array of all the matching docs with this email
-    if (users.length === 0) {
-      res.send("user not found");
-    } else {
-      res.send(users);
-    }
-  } catch (err) {
-    req.status(400).send("Something went wrong");
-  }
-});
-
-// api for the feed page : getting all the users from the db
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({}); // empty filter returns all data
-    res.send(users);
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-// api to delete a user from db (by id)
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-
-  try {
-    await User.findByIdAndDelete(userId);
-    res.send("user deleted successfully");
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-// api to update a user's data
+// // api to update a user's data
 app.patch("/user/:userId", async (req, res) => {
   const userId = req.params?.userId;
   const data = req.body;
