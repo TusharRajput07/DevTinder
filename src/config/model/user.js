@@ -34,11 +34,15 @@ const userSchema = new mongoose.Schema(
     age: { type: Number, min: 18, max: 100 },
     gender: {
       type: String,
-      validate(value) {
-        if (!["male", "female", "other"].includes(value)) {
-          throw new Error("Gender can only be male, female or other");
-        }
+      enum: {
+        values: ["male", "female", "other"],
+        message: `{VALUE} is incorrect gender type`,
       },
+      // validate(value) {
+      //   if (!["male", "female", "other"].includes(value)) {
+      //     throw new Error("Gender can only be male, female or other");
+      //   }
+      // },
     },
     bio: { type: String, maxlength: 300 },
     photoURL: {
