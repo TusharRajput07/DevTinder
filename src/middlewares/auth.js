@@ -5,6 +5,7 @@ const User = require("../config/model/user");
 const userAuth = async (req, res, next) => {
   try {
     // get the token from the cookie and verify it
+    console.log(req, "llllllllllll");
 
     const { token } = req.cookies;
     if (!token) {
@@ -28,7 +29,7 @@ const userAuth = async (req, res, next) => {
     req.user = user; // saving the user data to the req so that the handler can get the data after we call next
     next();
   } catch (err) {
-    res.status(400).send("Error: " + err.message);
+    res.status(401).send("Error: " + err.message);
   }
 };
 

@@ -8,7 +8,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://192.168.1.73:5173"],
     credentials: true,
   })
 );
@@ -26,77 +26,11 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
-// // api to get a user with email from db
-// app.get("/user", async (req, res) => {
-//   const userEmail = req.body.email;
-
-//   try {
-//     const users = await User.find({ email: userEmail }); // returns an array of all the matching docs with this email
-//     if (users.length === 0) {
-//       res.send("user not found");
-//     } else {
-//       res.send(users);
-//     }
-//   } catch (err) {
-//     req.status(400).send("Something went wrong");
-//   }
-// });
-
-// // api for the feed page : getting all the users from the db
-// app.get("/feed", async (req, res) => {
-//   try {
-//     const users = await User.find({}); // empty filter returns all data
-//     res.send(users);
-//   } catch (err) {
-//     res.status(400).send("Something went wrong");
-//   }
-// });
-
-// // api to delete a user from db (by id)
-// app.delete("/user", async (req, res) => {
-//   const userId = req.body.userId;
-
-//   try {
-//     await User.findByIdAndDelete(userId);
-//     res.send("user deleted successfully");
-//   } catch (err) {
-//     res.status(400).send("Something went wrong");
-//   }
-// });
-
-// // api to update a user's data
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-
-  try {
-    const ALLOWED_UPDATES = ["bio", "age", "gender", "photoURL"];
-
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-
-    if (!isUpdateAllowed) {
-      throw new Error("update not allowed");
-    }
-
-    await User.findByIdAndUpdate(userId, data);
-    // or
-    // const user = await User.findByIdAndUpdate(userId, data, {
-    //   returnDocument: "before",
-    // });
-    // console.log(user);
-    res.send("User data updated successfully");
-  } catch (err) {
-    res.status(400).send("Update Failed : " + err.message);
-  }
-});
-
-// calling the connectDB finction first. only then we'll start listening on port 3000
+// calling the connectDB function first. only then we'll start listening on port 3000
 connectDB()
   .then(() => {
     console.log("successfully connected to database");
-    app.listen(7777, () => {
+    app.listen(7777, "0.0.0.0", () => {
       console.log("server succesfully listening on port 7777");
     });
   })

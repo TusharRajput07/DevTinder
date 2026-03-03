@@ -67,6 +67,7 @@ requestRouter.post(
         data,
       });
     } catch (err) {
+      console.log(err);
       res.status(400).send("ERROR: " + err.message);
     }
   }
@@ -96,10 +97,6 @@ requestRouter.post(
         toUserId: loggedInUser._id,
         status: "interested",
       });
-
-      console.log(requestId, loggedInUser);
-
-      console.log(connectionRequest);
 
       if (!connectionRequest) {
         return res

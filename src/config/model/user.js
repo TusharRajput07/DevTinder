@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema(
       },
     },
     age: { type: Number, min: 18, max: 100 },
+    userLocation: { type: String, trim: true },
     gender: {
       type: String,
       enum: {
@@ -45,7 +46,19 @@ const userSchema = new mongoose.Schema(
       // },
     },
     bio: { type: String, maxlength: 300 },
+    skills: { type: String, maxlength: 300 },
+    hobbies: { type: String, maxlength: 300 },
     photoURL: {
+      type: String,
+      default:
+        "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=612x612&w=0&k=20&c=dhV2p1JwmloBTOaGAtaA3AW1KSnjsdMt7-U_3EZElZ0=",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("photo url not valid : " + value);
+        }
+      },
+    },
+    photoURL2: {
       type: String,
       default:
         "https://media.istockphoto.com/id/1495088043/vector/user-profile-icon-avatar-or-person-icon-profile-picture-portrait-symbol-default-portrait.jpg?s=612x612&w=0&k=20&c=dhV2p1JwmloBTOaGAtaA3AW1KSnjsdMt7-U_3EZElZ0=",

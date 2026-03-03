@@ -18,6 +18,8 @@ userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
       "age",
       "gender",
       "bio",
+      "userLocation",
+      "photoURL",
     ]);
 
     res.json({
@@ -40,8 +42,23 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         { fromUserId: loggedInUser._id, status: "accepted" },
       ],
     })
-      .populate("fromUserId", ["firstName", "lastName", "age", "gender", "bio"])
-      .populate("toUserId", ["firstName", "lastName", "age", "gender", "bio"]);
+      .populate("fromUserId", [
+        "firstName",
+        "lastName",
+        "age",
+        "gender",
+        "userLocation",
+        "bio",
+        "photoURL",
+      ])
+      .populate("toUserId", [
+        "firstName",
+        "lastName",
+        "age",
+        "gender",
+        "bio",
+        "photoURL",
+      ]);
 
     // now we only need the user name and other details. we dont want details about the connection request. so well remove it
 
@@ -61,6 +78,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 // api to get the feed of a logged in user
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
+    console.log(req, "kkkkk");
     const loggedInUser = req.user;
 
     const page = parseInt(req.query.page) || 1;
@@ -84,7 +102,17 @@ userRouter.get("/feed", userAuth, async (req, res) => {
         { _id: { $ne: loggedInUser._id } },
       ],
     })
-      .select(["firstName", "lastName", "age", "gender", "bio"])
+      .select([
+        "firstName",
+        "lastName",
+        "age",
+        "gender",
+        "bio",
+        "skills",
+        "userLocation",
+        "hobbies",
+        "photoURL",
+      ])
       .skip(skip)
       .limit(limit);
 

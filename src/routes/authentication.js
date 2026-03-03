@@ -8,16 +8,26 @@ const authRouter = express.Router();
 // api to save a user to the database
 authRouter.post("/signup", async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    let { firstName, lastName, email, password } = req.body;
 
     // validate the data
     validateSignUpData(req);
+
+    // normalize email
+    email = email.trim().toLowerCase();
+
+    // check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ error: "User already exists with this email" });
+    }
 
     // encrypt the password
     const passwordHash = await bcrypt.hash(password, 10);
 
     // store the data
-
     const user = new User({
       firstName,
       lastName,
@@ -25,10 +35,18 @@ authRouter.post("/signup", async (req, res) => {
       password: passwordHash,
     });
 
-    await user.save();
-    res.send("User added successfully");
+    const savedUser = await user.save();
+
+    // create a jwt token
+    const token = await user.getJWT();
+
+    // add the token to cookie
+    res.cookie("token", token, { expires: new Date(Date.now() + 900000) }); // 15 mins
+
+    // send response
+    res.json({ message: "User added successfully", data: savedUser });
   } catch (err) {
-    res.status(400).send("Error saving the user : " + err.message);
+    res.status(400).send("ERROR : " + err.message);
   }
 });
 
@@ -50,7 +68,12 @@ authRouter.post("/login", async (req, res) => {
       const token = await user.getJWT();
 
       // add the token to cookie
-      res.cookie("token", token, { expires: new Date(Date.now() + 900000) });
+      // res.cookie("token", token, { expires: new Date(Date.now() + 900000) }); // 15 mins
+      // res.cookie("token", token, { expires: new Date(Date.now() + 60 * 500) }); // 1 minute
+
+      res.cookie("token", token, { expires: new Date(Date.now() + 3600000) }); // 1 hour
+
+      // res.cookie("token", token, { expires: new Date(Date.now() + 24 * 60 * 60 * 1000) }) // 1 day
 
       // send the response
       res.send(user);
@@ -58,7 +81,7 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("Invalid credentials");
     }
   } catch (err) {
-    res.status(400).send("Something went wrong : " + err.message);
+    res.status(400).json({ message: "Something went wrong : " + err.message });
   }
 });
 

@@ -19,6 +19,9 @@ const validateUpdateProfileData = (req) => {
     "bio",
     "age",
     "gender",
+    "skills",
+    "hobbies",
+    "userLocation",
     "photoURL",
   ];
 
