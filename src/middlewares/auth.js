@@ -5,8 +5,6 @@ const User = require("../config/model/user");
 const userAuth = async (req, res, next) => {
   try {
     // get the token from the cookie and verify it
-    console.log(req, "llllllllllll");
-
     const { token } = req.cookies;
     if (!token) {
       // when then user is not logged in. or the cookie has expired

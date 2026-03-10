@@ -67,10 +67,9 @@ requestRouter.post(
         data,
       });
     } catch (err) {
-      console.log(err);
       res.status(400).send("ERROR: " + err.message);
     }
-  }
+  },
 );
 
 // api to review connection request and then either accept them or reject them
@@ -111,7 +110,42 @@ requestRouter.post(
     } catch (err) {
       res.status(400).send("ERROR: " + err.message);
     }
-  }
+  },
+);
+
+// api to unmatch a match of a user
+requestRouter.delete(
+  "/request/unmatch/:matchUserId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const { matchUserId } = req.params;
+
+      const connection = await ConnectionRequest.findOneAndDelete({
+        $or: [
+          {
+            fromUserId: loggedInUser._id,
+            toUserId: matchUserId,
+            status: "accepted",
+          },
+          {
+            fromUserId: matchUserId,
+            toUserId: loggedInUser._id,
+            status: "accepted",
+          },
+        ],
+      });
+
+      if (!connection) {
+        return res.status(404).json({ message: "Match not found!" });
+      }
+
+      res.json({ message: "Unmatched successfully" });
+    } catch (err) {
+      res.status(400).send("ERROR: " + err.message);
+    }
+  },
 );
 
 module.exports = requestRouter;

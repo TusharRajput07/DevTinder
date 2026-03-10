@@ -78,7 +78,6 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
 // api to get the feed of a logged in user
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
-    console.log(req, "kkkkk");
     const loggedInUser = req.user;
 
     const page = parseInt(req.query.page) || 1;
