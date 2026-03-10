@@ -19,7 +19,7 @@ userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
       "gender",
       "bio",
       "userLocation",
-      "photoURL",
+      "photos",
     ]);
 
     res.json({
@@ -49,7 +49,7 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         "gender",
         "userLocation",
         "bio",
-        "photoURL",
+        "photos",
       ])
       .populate("toUserId", [
         "firstName",
@@ -57,10 +57,8 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         "age",
         "gender",
         "bio",
-        "photoURL",
+        "photos",
       ]);
-
-    // now we only need the user name and other details. we dont want details about the connection request. so well remove it
 
     const data = connectionRequests.map((row) => {
       if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
@@ -110,7 +108,7 @@ userRouter.get("/feed", userAuth, async (req, res) => {
         "skills",
         "userLocation",
         "hobbies",
-        "photoURL",
+        "photos",
       ])
       .skip(skip)
       .limit(limit);

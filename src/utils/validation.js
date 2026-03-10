@@ -30,7 +30,7 @@ const validateUpdateProfileData = (req) => {
     "skills",
     "hobbies",
     "userLocation",
-    "photoURL",
+    "photos",
   ];
 
   const isUpdateAllowed = Object.keys(req.body).every((field) =>
