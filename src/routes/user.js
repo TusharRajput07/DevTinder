@@ -18,6 +18,8 @@ userRouter.get("/user/requests/recieved", userAuth, async (req, res) => {
       "age",
       "gender",
       "bio",
+      "skills",
+      "hobbies",
       "userLocation",
       "photos",
     ]);
@@ -47,8 +49,10 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         "lastName",
         "age",
         "gender",
-        "userLocation",
         "bio",
+        "skills",
+        "hobbies",
+        "userLocation",
         "photos",
       ])
       .populate("toUserId", [
@@ -57,6 +61,9 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         "age",
         "gender",
         "bio",
+        "skills",
+        "hobbies",
+        "userLocation",
         "photos",
       ]);
 
@@ -106,8 +113,8 @@ userRouter.get("/feed", userAuth, async (req, res) => {
         "gender",
         "bio",
         "skills",
-        "userLocation",
         "hobbies",
+        "userLocation",
         "photos",
       ])
       .skip(skip)

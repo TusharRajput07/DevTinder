@@ -41,7 +41,6 @@ const userSchema = new mongoose.Schema(
     bio: { type: String, maxlength: 300 },
     skills: { type: String, maxlength: 300 },
     hobbies: { type: String, maxlength: 300 },
-    // up to 3 photos — index 0 is the main photo
     photos: {
       type: [String],
       default: [],
@@ -56,13 +55,20 @@ const userSchema = new mongoose.Schema(
         });
       },
     },
+    // email verification fields
+    isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    verificationTokenExpiry: { type: Date },
+    // password reset fields
+    resetPasswordToken: { type: String },
+    resetPasswordExpiry: { type: Date },
   },
   { timestamps: true },
 );
 
 userSchema.methods.getJWT = async function () {
   const user = this;
-  const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$123", {
+  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
   return token;
