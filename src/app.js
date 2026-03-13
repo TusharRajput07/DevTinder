@@ -23,6 +23,10 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.send("DevTinder API is running!");
+});
+
 const authRouter = require("./routes/authentication");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/requests");
