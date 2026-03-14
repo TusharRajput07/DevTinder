@@ -74,6 +74,7 @@ authRouter.post("/signup", async (req, res) => {
       info: "Account created! Please check your email to verify your account before logging in.",
     });
   } catch (err) {
+    console.error("SIGNUP ERROR:", err);
     res.status(400).send("ERROR : " + err.message);
   }
 });
