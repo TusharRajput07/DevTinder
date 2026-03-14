@@ -1,20 +1,12 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_SMTP_KEY,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendVerificationEmail = async (email, firstName, token, host) => {
   const verificationURL = `${host}/verify-email/${token}`;
 
-  await transporter.sendMail({
-    from: `"DevTinder" <${process.env.BREVO_USER}>`,
+  await resend.emails.send({
+    from: "DevTinder <onboarding@resend.dev>",
     to: email,
     subject: "Verify your DevTinder account",
     html: `
@@ -34,8 +26,8 @@ const sendVerificationEmail = async (email, firstName, token, host) => {
 const sendResetEmail = async (email, firstName, token, host) => {
   const resetURL = `${host}/reset-password/${token}`;
 
-  await transporter.sendMail({
-    from: `"DevTinder" <${process.env.BREVO_USER}>`,
+  await resend.emails.send({
+    from: "DevTinder <onboarding@resend.dev>",
     to: email,
     subject: "Reset your DevTinder password",
     html: `
@@ -53,9 +45,9 @@ const sendResetEmail = async (email, firstName, token, host) => {
 };
 
 const sendContactEmail = async (name, email, message) => {
-  await transporter.sendMail({
-    from: `"DevTinder Contact" <${process.env.BREVO_USER}>`,
-    to: process.env.BREVO_USER,
+  await resend.emails.send({
+    from: "DevTinder Contact <onboarding@resend.dev>",
+    to: process.env.BREVO_USER || process.env.EMAIL_USER,
     replyTo: email,
     subject: `New Contact Message from ${name}`,
     html: `
