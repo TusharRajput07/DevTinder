@@ -5,13 +5,13 @@ const User = require("../config/model/user");
 const authRouter = express.Router();
 
 const isProd = process.env.NODE_ENV === "production";
-const SEVEN_DAYS = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-const cookieOptions = {
-  expires: SEVEN_DAYS,
+
+const getCookieOptions = () => ({
+  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   httpOnly: true,
   secure: isProd,
   sameSite: isProd ? "none" : "lax",
-};
+});
 
 // api to save a user to the database
 authRouter.post("/signup", async (req, res) => {
@@ -41,7 +41,7 @@ authRouter.post("/signup", async (req, res) => {
 
     await user.save();
     const token = await user.getJWT();
-    res.cookie("token", token, cookieOptions);
+    res.cookie("token", token, getCookieOptions());
     res.status(200).json({ message: "signup_success", data: user });
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
@@ -59,7 +59,7 @@ authRouter.post("/login", async (req, res) => {
     const isPasswordValid = await user.validatePassword(password);
     if (isPasswordValid) {
       const token = await user.getJWT();
-      res.cookie("token", token, cookieOptions);
+      res.cookie("token", token, getCookieOptions());
       res.send(user);
     } else {
       throw new Error("Invalid credentials");
@@ -72,7 +72,7 @@ authRouter.post("/login", async (req, res) => {
 // api to logout the user
 authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, {
-    ...cookieOptions,
+    ...getCookieOptions(),
     expires: new Date(Date.now()),
   });
   res.send("logout successfull!");
