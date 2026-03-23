@@ -109,7 +109,7 @@ io.on("connection", (socket) => {
 
 connectDB()
   .then(() => {
-    server.listen(7777, "0.0.0.0");
+    server.listen(process.env.PORT || 7777, "0.0.0.0");
 
     // ping DB every 24 hours to prevent MongoDB Atlas from pausing
     cron.schedule("0 0 * * *", async () => {
